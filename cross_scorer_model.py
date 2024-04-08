@@ -149,40 +149,9 @@ class CrossScorerCrossEncoder(nn.Module):
             return_dict=return_dict,
         ).sigmoid().squeeze()
 
-        if True:
-            loss_fct = torch.nn.MSELoss()
 
-            BSZ = pair_scores.size(0) 
-            BSZ = int(BSZ/(4+1))
-    
-            label = torch.zeros(5).float() 
-            label[0] = 1.0
-            label[1] = 0.5
-            labels = torch.cat( [ label for x in range(BSZ)], -1).float().to(self.device)
-    
-
-            if True:
-
-                
-                import numpy as np
-                idx = np.array([i for i in range(len(pair_scores)) if i%5!=4])
-                pair_scores = pair_scores[idx]
-                labels = labels[idx]
-
-   
-            reg_loss = loss_fct(pair_scores, labels)
-            return SequenceClassifierOutput(
-                loss=reg_loss,
-                logits=pair_scores,
-                )
-
-        labels = None
-
-        if not random:
-            cl_loss = self.cl_loss(pair_scores, labels)
-        else:
-            cl_loss = self.cl_loss_all_random(pair_scores, labels)
-   
+            
+        cl_loss = self.cl_loss(pair_scores, labels)
 
         loss =   cl_loss 
         return SequenceClassifierOutput(
